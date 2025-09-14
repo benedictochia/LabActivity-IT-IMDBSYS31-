@@ -1,0 +1,10 @@
+C:\Ochia, Benedict\IT-IMDBSYS31\StudentCRUDApp\StudentCRUDApp\bin\Debug\StudentCRUDApp.exe.config
+C:\Ochia, Benedict\IT-IMDBSYS31\StudentCRUDApp\StudentCRUDApp\bin\Debug\StudentCRUDApp.exe
+C:\Ochia, Benedict\IT-IMDBSYS31\StudentCRUDApp\StudentCRUDApp\bin\Debug\StudentCRUDApp.pdb
+C:\Ochia, Benedict\IT-IMDBSYS31\StudentCRUDApp\StudentCRUDApp\obj\Debug\StudentCRUDApp.csproj.AssemblyReference.cache
+C:\Ochia, Benedict\IT-IMDBSYS31\StudentCRUDApp\StudentCRUDApp\obj\Debug\StudentCRUDApp.Form1.resources
+C:\Ochia, Benedict\IT-IMDBSYS31\StudentCRUDApp\StudentCRUDApp\obj\Debug\StudentCRUDApp.Properties.Resources.resources
+C:\Ochia, Benedict\IT-IMDBSYS31\StudentCRUDApp\StudentCRUDApp\obj\Debug\StudentCRUDApp.csproj.GenerateResource.cache
+C:\Ochia, Benedict\IT-IMDBSYS31\StudentCRUDApp\StudentCRUDApp\obj\Debug\StudentCRUDApp.csproj.CoreCompileInputs.cache
+C:\Ochia, Benedict\IT-IMDBSYS31\StudentCRUDApp\StudentCRUDApp\obj\Debug\StudentCRUDApp.exe
+C:\Ochia, Benedict\IT-IMDBSYS31\StudentCRUDApp\StudentCRUDApp\obj\Debug\StudentCRUDApp.pdb
