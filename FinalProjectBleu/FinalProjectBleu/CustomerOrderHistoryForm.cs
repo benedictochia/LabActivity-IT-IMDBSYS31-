@@ -33,7 +33,8 @@ namespace FinalProjectBleu
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 conn.Open();
-                string query = "SELECT OrderID, OrderDate, TotalAmount FROM Orders WHERE CustomerID = @id ORDER BY OrderDate DESC";
+                string query = "SELECT OrderID, OrderDate, TotalAmount, Status FROM Orders WHERE CustomerID = @id ORDER BY OrderDate DESC";
+
 
                 SqlCommand cmd = new SqlCommand(query, conn);
                 cmd.Parameters.AddWithValue("@id", customerID);

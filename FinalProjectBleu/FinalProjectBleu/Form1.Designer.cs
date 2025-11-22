@@ -34,8 +34,6 @@
             this.txtPassword = new System.Windows.Forms.TextBox();
             this.btnLogin = new System.Windows.Forms.Button();
             this.lblMessage = new System.Windows.Forms.Label();
-            this.label3 = new System.Windows.Forms.Label();
-            this.cmbRole = new System.Windows.Forms.ComboBox();
             this.btnRegister = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
@@ -87,27 +85,10 @@
             // 
             this.lblMessage.AutoSize = true;
             this.lblMessage.ForeColor = System.Drawing.Color.FromArgb(((int)(((byte)(0)))), ((int)(((byte)(192)))), ((int)(((byte)(0)))));
-            this.lblMessage.Location = new System.Drawing.Point(134, 214);
+            this.lblMessage.Location = new System.Drawing.Point(12, 269);
             this.lblMessage.Name = "lblMessage";
             this.lblMessage.Size = new System.Drawing.Size(0, 13);
             this.lblMessage.TabIndex = 5;
-            // 
-            // label3
-            // 
-            this.label3.AutoSize = true;
-            this.label3.Location = new System.Drawing.Point(73, 69);
-            this.label3.Name = "label3";
-            this.label3.Size = new System.Drawing.Size(50, 13);
-            this.label3.TabIndex = 6;
-            this.label3.Text = "Login as:";
-            // 
-            // cmbRole
-            // 
-            this.cmbRole.FormattingEnabled = true;
-            this.cmbRole.Location = new System.Drawing.Point(137, 66);
-            this.cmbRole.Name = "cmbRole";
-            this.cmbRole.Size = new System.Drawing.Size(100, 21);
-            this.cmbRole.TabIndex = 7;
             // 
             // btnRegister
             // 
@@ -125,8 +106,6 @@
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(332, 291);
             this.Controls.Add(this.btnRegister);
-            this.Controls.Add(this.cmbRole);
-            this.Controls.Add(this.label3);
             this.Controls.Add(this.lblMessage);
             this.Controls.Add(this.btnLogin);
             this.Controls.Add(this.txtPassword);
@@ -150,8 +129,6 @@
         private System.Windows.Forms.TextBox txtPassword;
         private System.Windows.Forms.Button btnLogin;
         private System.Windows.Forms.Label lblMessage;
-        private System.Windows.Forms.Label label3;
-        private System.Windows.Forms.ComboBox cmbRole;
         private System.Windows.Forms.Button btnRegister;
     }
 }

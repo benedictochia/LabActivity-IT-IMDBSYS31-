@@ -25,12 +25,6 @@ namespace FinalProjectBleu
 
         }
 
-        private void btnHistory_Click(object sender, EventArgs e)
-        {
-            this.Hide();
-           // new CustomerOrderHistoryForm().Show();
-        }
-
         private void btnLogout_Click(object sender, EventArgs e)
         {
             this.Hide();

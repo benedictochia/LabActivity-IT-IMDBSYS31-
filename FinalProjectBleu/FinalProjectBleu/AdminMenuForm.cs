@@ -32,6 +32,20 @@ namespace FinalProjectBleu
                 dgvMenu.DataSource = dt;
             }
         }
+        private void SearchMenu(string keyword)
+        {
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                string query = "SELECT * FROM Menu WHERE ItemName LIKE @kw OR Category LIKE @kw";
+                SqlDataAdapter da = new SqlDataAdapter(query, conn);
+                da.SelectCommand.Parameters.AddWithValue("@kw", "%" + keyword + "%");
+
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+                dgvMenu.DataSource = dt;
+            }
+        }
+
         private void btnAdd_Click_1(object sender, EventArgs e)
         {
             using (SqlConnection conn = new SqlConnection(connectionString))
@@ -98,6 +112,15 @@ namespace FinalProjectBleu
                 txtPrice.Text = row.Cells["Price"].Value.ToString();
                 txtCategory.Text = row.Cells["Category"].Value.ToString();
             }
+        }
+
+        private void txtSearch_TextChanged(object sender, EventArgs e)
+        {
+            string keyword = txtSearch.Text.Trim();
+            if (string.IsNullOrEmpty(keyword))
+                LoadMenu();
+            else
+                SearchMenu(keyword);
         }
     }
 }

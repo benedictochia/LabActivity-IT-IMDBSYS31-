@@ -37,6 +37,22 @@ namespace FinalProjectBleu
                 dgvMenu.DataSource = dt;
             }
         }
+        private void SearchMenu(string keyword)
+        {
+            using (SqlConnection conn = new SqlConnection(connectionString))
+            {
+                string query = "SELECT ItemID, ItemName, Category, Price FROM Menu " +
+                               "WHERE ItemName LIKE @kw OR Category LIKE @kw";
+
+                SqlDataAdapter da = new SqlDataAdapter(query, conn);
+                da.SelectCommand.Parameters.AddWithValue("@kw", "%" + keyword + "%");
+
+                DataTable dt = new DataTable();
+                da.Fill(dt);
+                dgvMenu.DataSource = dt;
+            }
+        }
+
         private void SetupCartTable()
         {
             cartTable.Columns.Add("ItemID", typeof(int));
@@ -111,14 +127,14 @@ namespace FinalProjectBleu
             {
                 conn.Open();
 
-                // ✅ Make sure currentCustomerID is valid
+     
                 if (currentCustomerID <= 0)
                 {
                     MessageBox.Show("Invalid customer session. Please log in again.");
                     return;
                 }
 
-                // ✅ Insert into Orders table
+              
                 string orderQuery = "INSERT INTO Orders (CustomerID, TotalAmount, OrderDate) OUTPUT INSERTED.OrderID VALUES (@cid, @total, GETDATE())";
                 SqlCommand cmdOrder = new SqlCommand(orderQuery, conn);
                 cmdOrder.Parameters.AddWithValue("@cid", currentCustomerID);
@@ -126,7 +142,7 @@ namespace FinalProjectBleu
 
                 int orderId = (int)cmdOrder.ExecuteScalar();
 
-                // ✅ Insert each order item
+              
                 foreach (DataRow row in cartTable.Rows)
                 {
                     string itemQuery = "INSERT INTO OrderItems (OrderID, ItemID, Quantity, Subtotal) VALUES (@oid, @iid, @q, @s)";
@@ -155,6 +171,17 @@ namespace FinalProjectBleu
             new CustomerDashboard(currentCustomerID).Show();
         }
 
-        
+        private void txtSearch_TextChanged(object sender, EventArgs e)
+        {
+            string keyword = txtSearch.Text.Trim();
+            if (string.IsNullOrEmpty(keyword))
+            {
+                LoadMenu();
+            }
+            else
+            {
+                SearchMenu(keyword);
+            }
+        }
     }
 }

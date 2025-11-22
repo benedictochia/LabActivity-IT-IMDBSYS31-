@@ -1,14 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Data.SqlClient;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
-using FinalProjectBleu;
 
 namespace FinalProjectBleu
 {
@@ -20,75 +12,65 @@ namespace FinalProjectBleu
         public AdminLoginForm()
         {
             InitializeComponent();
-            cmbRole.Items.Add("Admin");
-            cmbRole.Items.Add("Customer");
         }
+
         private void btnLogin_Click_1(object sender, EventArgs e)
         {
-            if (cmbRole.SelectedItem == null)
+            string username = txtUsername.Text.Trim();
+            string password = txtPassword.Text.Trim();
+
+            if (string.IsNullOrEmpty(username) || string.IsNullOrEmpty(password))
             {
-                lblMessage.Text = "Please select a role.";
+                lblMessage.Text = "Please enter both username and password.";
                 return;
             }
-
-            string role = cmbRole.SelectedItem.ToString();
-            string username = txtUsername.Text;
-            string password = txtPassword.Text;
 
             using (SqlConnection conn = new SqlConnection(connectionString))
             {
                 conn.Open();
 
-                if (role == "Admin")
-                {
-                    string query = "SELECT * FROM Admins WHERE Username=@u AND Password=@p";
-                    SqlCommand cmd = new SqlCommand(query, conn);
-                    cmd.Parameters.AddWithValue("@u", username);
-                    cmd.Parameters.AddWithValue("@p", password);
+                string adminQuery = "SELECT * FROM Admins WHERE Username=@u AND Password=@p";
+                SqlCommand adminCmd = new SqlCommand(adminQuery, conn);
+                adminCmd.Parameters.AddWithValue("@u", username);
+                adminCmd.Parameters.AddWithValue("@p", password);
 
-                    SqlDataReader dr = cmd.ExecuteReader();
-                    if (dr.Read())
-                    {
-                        this.Hide();
-                        new AdminDashboard().Show();
-                    }
-                    else
-                    {
-                        lblMessage.Text = "Invalid admin credentials.";
-                    }
-                }
-                else if (role == "Customer")
+                SqlDataReader dr = adminCmd.ExecuteReader();
+                if (dr.Read())
                 {
-                    string query = "SELECT CustomerID FROM Customers WHERE Username=@u AND Password=@p";
-                    SqlCommand cmd = new SqlCommand(query, conn);
-                    cmd.Parameters.AddWithValue("@u", username);
-                    cmd.Parameters.AddWithValue("@p", password);
-
-                    SqlDataReader dr = cmd.ExecuteReader();
-                    if (dr.Read())
-                    {
-                        int customerID = (int)dr["CustomerID"];
-                        this.Hide();
-                        new CustomerDashboard(customerID).Show();
-                    }
-                    else
-                    {
-                        lblMessage.Text = "Invalid customer credentials.";
-                    }
+                    dr.Close();
+                    this.Hide();
+                    new AdminDashboard().Show();
+                    return;
                 }
+                dr.Close();
+                string customerQuery = "SELECT CustomerID FROM Customers WHERE Username=@u AND Password=@p";
+                SqlCommand customerCmd = new SqlCommand(customerQuery, conn);
+                customerCmd.Parameters.AddWithValue("@u", username);
+                customerCmd.Parameters.AddWithValue("@p", password);
+
+                SqlDataReader dr2 = customerCmd.ExecuteReader();
+                if (dr2.Read())
+                {
+                    int customerID = (int)dr2["CustomerID"];
+                    dr2.Close();
+                    this.Hide();
+                    new CustomerDashboard(customerID).Show();
+                    return;
+                }
+                dr2.Close();
+                lblMessage.Text = "Invalid username or password.";
             }
         }
+
         private void btnRegister_Click_1(object sender, EventArgs e)
         {
             this.Hide();
             new RegisterForm().Show();
         }
+
         private void AdminLoginForm_Load(object sender, EventArgs e)
         {
 
         }
-
-      
     }
 }
-
