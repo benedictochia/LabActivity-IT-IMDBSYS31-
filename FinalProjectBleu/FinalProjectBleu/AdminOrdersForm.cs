@@ -20,71 +20,123 @@ namespace FinalProjectBleu
             LoadCompletedOrders();
         }
 
-    
         private void LoadPendingOrders()
         {
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            try
             {
-                conn.Open();
-                string query = @"
-                SELECT o.OrderID, c.Username AS Customer, o.OrderDate, o.TotalAmount, o.Status
-                FROM Orders o
-                INNER JOIN Customers c ON o.CustomerID = c.CustomerID
-                WHERE o.Status = 'Pending'
-                ORDER BY o.OrderDate DESC";
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    string query = @"
+                    SELECT o.OrderID, c.Username AS Customer, o.OrderDate, o.TotalAmount, o.Status
+                    FROM Orders o
+                    INNER JOIN Customers c ON o.CustomerID = c.CustomerID
+                    WHERE o.Status = 'Pending'
+                    ORDER BY o.OrderDate DESC";
 
-                SqlDataAdapter da = new SqlDataAdapter(query, conn);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
-                dgvPendingOrders.DataSource = dt;
+                    SqlDataAdapter da = new SqlDataAdapter(query, conn);
+                    DataTable dt = new DataTable();
+                    da.Fill(dt);
+                    dgvPendingOrders.DataSource = dt;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading pending orders: {ex.Message}", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-       
         private void LoadCompletedOrders()
         {
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            try
             {
-                conn.Open();
-                string query = @"
-                SELECT o.OrderID, c.Username AS Customer, o.OrderDate, o.TotalAmount, o.Status
-                FROM Orders o
-                INNER JOIN Customers c ON o.CustomerID = c.CustomerID
-                WHERE o.Status = 'Completed'
-                ORDER BY o.OrderDate DESC";
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    conn.Open();
+                    string query = @"
+                    SELECT o.OrderID, c.Username AS Customer, o.OrderDate, o.TotalAmount, o.Status
+                    FROM Orders o
+                    INNER JOIN Customers c ON o.CustomerID = c.CustomerID
+                    WHERE o.Status = 'Completed'
+                    ORDER BY o.OrderDate DESC";
 
-                SqlDataAdapter da = new SqlDataAdapter(query, conn);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
-                dgvCompletedOrders.DataSource = dt;
+                    SqlDataAdapter da = new SqlDataAdapter(query, conn);
+                    DataTable dt = new DataTable();
+                    da.Fill(dt);
+                    dgvCompletedOrders.DataSource = dt;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading completed orders: {ex.Message}", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
-      
+        private void ToggleOrderStatus(int orderId, string currentStatus)
+        {
+            string newStatus = currentStatus.Equals("Completed", StringComparison.OrdinalIgnoreCase) ? "Pending" : "Completed";
+
+            try
+            {
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    SqlCommand cmd = new SqlCommand("UPDATE Orders SET Status=@newStatus WHERE OrderID=@id", conn);
+                    cmd.Parameters.AddWithValue("@newStatus", newStatus);
+                    cmd.Parameters.AddWithValue("@id", orderId);
+
+                    conn.Open();
+                    cmd.ExecuteNonQuery();
+
+                    MessageBox.Show($"Order {orderId} status successfully changed from {currentStatus} to {newStatus}.", "Status Updated", MessageBoxButtons.OK, MessageBoxIcon.Information);
+
+                    LoadPendingOrders();
+                    LoadCompletedOrders();
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Database error during status update: {ex.Message}", "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            }
+        }
+
         private void btnUpdateStatus_Click_1(object sender, EventArgs e)
         {
-            if (dgvPendingOrders.CurrentRow == null)
+            DataGridViewRow selectedRow = null;
+            if (dgvPendingOrders.CurrentRow != null)
             {
-                MessageBox.Show("Please select a pending order to update.");
+                selectedRow = dgvPendingOrders.CurrentRow;
+            }
+            else if (dgvCompletedOrders.CurrentRow != null)
+            {
+                selectedRow = dgvCompletedOrders.CurrentRow;
+            }
+
+            if (selectedRow == null)
+            {
+                MessageBox.Show("Please select an order to update its status from either the Pending or Completed lists.", "Selection Required", MessageBoxButtons.OK, MessageBoxIcon.Information);
                 return;
             }
 
-            int orderId = Convert.ToInt32(dgvPendingOrders.CurrentRow.Cells["OrderID"].Value);
+            int orderId = Convert.ToInt32(selectedRow.Cells["OrderID"].Value);
+            string currentStatus = selectedRow.Cells["Status"].Value.ToString();
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            string nextStatus = currentStatus.Equals("Completed", StringComparison.OrdinalIgnoreCase) ? "Pending" : "Completed";
+
+            DialogResult result = MessageBox.Show(
+                $"Toggle status for Order ID {orderId}? \n\n" +
+                $"Current Status: {currentStatus}\n" +
+                $"New Status will be: {nextStatus}",
+                "Confirm Status Toggle",
+                MessageBoxButtons.YesNo,
+                MessageBoxIcon.Question);
+
+            if (result == DialogResult.Yes)
             {
-                conn.Open();
-                SqlCommand cmd = new SqlCommand("UPDATE Orders SET Status='Completed' WHERE OrderID=@id", conn);
-                cmd.Parameters.AddWithValue("@id", orderId);
-                cmd.ExecuteNonQuery();
+                ToggleOrderStatus(orderId, currentStatus);
             }
-
-            MessageBox.Show("Order marked as completed!");
-            LoadPendingOrders();
-            LoadCompletedOrders();
         }
 
-       
+
         private void btnRefresh_Click_1(object sender, EventArgs e)
         {
             LoadPendingOrders();

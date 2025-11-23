@@ -1,12 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
 using System.Data;
 using System.Data.SqlClient;
-using System.Drawing;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace FinalProjectBleu
@@ -27,29 +21,45 @@ namespace FinalProjectBleu
             LoadMenu();
             SetupCartTable();
         }
+
         private void LoadMenu()
         {
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            try
             {
-                SqlDataAdapter da = new SqlDataAdapter("SELECT ItemID, ItemName, Category, Price FROM Menu", conn);
-                DataTable dt = new DataTable();
-                da.Fill(dt);
-                dgvMenu.DataSource = dt;
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    SqlDataAdapter da = new SqlDataAdapter("SELECT ItemID, ItemName, Category, Price FROM Menu WHERE Status = 'Available'", conn);
+                    DataTable dt = new DataTable();
+                    da.Fill(dt);
+                    dgvMenu.DataSource = dt;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error loading menu: {ex.Message}", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
+
         private void SearchMenu(string keyword)
         {
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            try
             {
-                string query = "SELECT ItemID, ItemName, Category, Price FROM Menu " +
-                               "WHERE ItemName LIKE @kw OR Category LIKE @kw";
+                using (SqlConnection conn = new SqlConnection(connectionString))
+                {
+                    string query = "SELECT ItemID, ItemName, Category, Price FROM Menu " +
+                                   "WHERE (ItemName LIKE @kw OR Category LIKE @kw) AND Status = 'Available'";
 
-                SqlDataAdapter da = new SqlDataAdapter(query, conn);
-                da.SelectCommand.Parameters.AddWithValue("@kw", "%" + keyword + "%");
+                    SqlDataAdapter da = new SqlDataAdapter(query, conn);
+                    da.SelectCommand.Parameters.AddWithValue("@kw", "%" + keyword + "%");
 
-                DataTable dt = new DataTable();
-                da.Fill(dt);
-                dgvMenu.DataSource = dt;
+                    DataTable dt = new DataTable();
+                    da.Fill(dt);
+                    dgvMenu.DataSource = dt;
+                }
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error searching menu: {ex.Message}", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -63,6 +73,7 @@ namespace FinalProjectBleu
 
             dgvCart.DataSource = cartTable;
         }
+
         private void btnAddToCart_Click_1(object sender, EventArgs e)
         {
             if (dgvMenu.CurrentRow == null)
@@ -123,46 +134,49 @@ namespace FinalProjectBleu
                 total += (decimal)row["Subtotal"];
             }
 
-            using (SqlConnection conn = new SqlConnection(connectionString))
+            try
             {
-                conn.Open();
-
-     
-                if (currentCustomerID <= 0)
+                using (SqlConnection conn = new SqlConnection(connectionString))
                 {
-                    MessageBox.Show("Invalid customer session. Please log in again.");
-                    return;
+                    conn.Open();
+
+                    if (currentCustomerID <= 0)
+                    {
+                        MessageBox.Show("Invalid customer session. Please log in again.");
+                        return;
+                    }
+
+                    string orderQuery = "INSERT INTO Orders (CustomerID, TotalAmount, OrderDate) OUTPUT INSERTED.OrderID VALUES (@cid, @total, GETDATE())";
+                    SqlCommand cmdOrder = new SqlCommand(orderQuery, conn);
+                    cmdOrder.Parameters.AddWithValue("@cid", currentCustomerID);
+                    cmdOrder.Parameters.AddWithValue("@total", total);
+
+                    int orderId = (int)cmdOrder.ExecuteScalar();
+
+                    foreach (DataRow row in cartTable.Rows)
+                    {
+                        string itemQuery = "INSERT INTO OrderItems (OrderID, ItemID, Quantity, Subtotal) VALUES (@oid, @iid, @q, @s)";
+                        SqlCommand cmdItem = new SqlCommand(itemQuery, conn);
+                        cmdItem.Parameters.AddWithValue("@oid", orderId);
+                        cmdItem.Parameters.AddWithValue("@iid", (int)row["ItemID"]);
+                        cmdItem.Parameters.AddWithValue("@q", (int)row["Quantity"]);
+                        cmdItem.Parameters.AddWithValue("@s", (decimal)row["Subtotal"]);
+                        cmdItem.ExecuteNonQuery();
+                    }
+
+                    MessageBox.Show("Order placed successfully!");
+                    cartTable.Clear();
+                    UpdateTotal();
                 }
-
-              
-                string orderQuery = "INSERT INTO Orders (CustomerID, TotalAmount, OrderDate) OUTPUT INSERTED.OrderID VALUES (@cid, @total, GETDATE())";
-                SqlCommand cmdOrder = new SqlCommand(orderQuery, conn);
-                cmdOrder.Parameters.AddWithValue("@cid", currentCustomerID);
-                cmdOrder.Parameters.AddWithValue("@total", total);
-
-                int orderId = (int)cmdOrder.ExecuteScalar();
-
-              
-                foreach (DataRow row in cartTable.Rows)
-                {
-                    string itemQuery = "INSERT INTO OrderItems (OrderID, ItemID, Quantity, Subtotal) VALUES (@oid, @iid, @q, @s)";
-                    SqlCommand cmdItem = new SqlCommand(itemQuery, conn);
-                    cmdItem.Parameters.AddWithValue("@oid", orderId);
-                    cmdItem.Parameters.AddWithValue("@iid", (int)row["ItemID"]);
-                    cmdItem.Parameters.AddWithValue("@q", (int)row["Quantity"]);
-                    cmdItem.Parameters.AddWithValue("@s", (decimal)row["Subtotal"]);
-                    cmdItem.ExecuteNonQuery();
-                }
-
-                MessageBox.Show("Order placed successfully!");
-                cartTable.Clear();
-                UpdateTotal();
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Error placing order: {ex.Message}", "Database Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
         private void menuStrip1_ItemClicked(object sender, ToolStripItemClickedEventArgs e)
         {
-
         }
 
         private void returnToDashboardToolStripMenuItem_Click(object sender, EventArgs e)

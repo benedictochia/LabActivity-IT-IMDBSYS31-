@@ -39,3 +39,6 @@ CREATE TABLE OrderItems (
 INSERT INTO Admins (Username, Password) VALUES ('admin', '12345');
 ALTER TABLE Orders
 ADD Status NVARCHAR(50) DEFAULT 'Pending';
+ALTER TABLE Menu
+ADD Status NVARCHAR(50) NOT NULL DEFAULT 'Available';
+

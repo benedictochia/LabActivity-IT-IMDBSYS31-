@@ -42,6 +42,7 @@
             this.btnBack = new System.Windows.Forms.ToolStripMenuItem();
             this.label4 = new System.Windows.Forms.Label();
             this.txtSearch = new System.Windows.Forms.TextBox();
+            this.btnHardDelete = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.dgvMenu)).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -125,11 +126,11 @@
             // 
             // btnDelete
             // 
-            this.btnDelete.Location = new System.Drawing.Point(474, 118);
+            this.btnDelete.Location = new System.Drawing.Point(474, 147);
             this.btnDelete.Name = "btnDelete";
             this.btnDelete.Size = new System.Drawing.Size(75, 23);
             this.btnDelete.TabIndex = 9;
-            this.btnDelete.Text = "Delete";
+            this.btnDelete.Text = "Status";
             this.btnDelete.UseVisualStyleBackColor = true;
             this.btnDelete.Click += new System.EventHandler(this.btnDelete_Click_1);
             // 
@@ -167,11 +168,22 @@
             this.txtSearch.TabIndex = 11;
             this.txtSearch.TextChanged += new System.EventHandler(this.txtSearch_TextChanged);
             // 
+            // btnHardDelete
+            // 
+            this.btnHardDelete.Location = new System.Drawing.Point(474, 118);
+            this.btnHardDelete.Name = "btnHardDelete";
+            this.btnHardDelete.Size = new System.Drawing.Size(75, 23);
+            this.btnHardDelete.TabIndex = 12;
+            this.btnHardDelete.Text = "Delete";
+            this.btnHardDelete.UseVisualStyleBackColor = true;
+            this.btnHardDelete.Click += new System.EventHandler(this.btnHardDelete_Click);
+            // 
             // AdminMenuForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(609, 419);
+            this.Controls.Add(this.btnHardDelete);
             this.Controls.Add(this.txtSearch);
             this.Controls.Add(this.label4);
             this.Controls.Add(this.btnDelete);
@@ -214,5 +226,6 @@
         private System.Windows.Forms.ToolStripMenuItem btnBack;
         private System.Windows.Forms.Label label4;
         private System.Windows.Forms.TextBox txtSearch;
+        private System.Windows.Forms.Button btnHardDelete;
     }
 }
